@@ -36,7 +36,7 @@ label{font-weight:500;font-size:14px}
 </div>
 <div id="msg" role="status"></div>
 <script>
-const API="PASTE_WEB_APP_URL_HERE", $=i=>document.getElementById(i); let tok=sessionStorage.getItem("tk"), D={};
+const API="https://script.google.com/macros/s/AKfycby_VuQTDiZDGJgdw_GdIAPn7ZidsO2jVWII0mXdbC-jLniFLJzlGwO21Ky1IBlEh8Oa/exec", $=i=>document.getElementById(i); let tok=sessionStorage.getItem("tk"), D={};
 const say=t=>{const m=$("msg");m.textContent=t;m.style.display="block";setTimeout(()=>m.style.display="none",3000)};
 async function post(o){
   try{const r=await (await fetch(API,{method:"POST",body:JSON.stringify({token:tok,...o})})).json();
