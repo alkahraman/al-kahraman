@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>إدارة الكهرمان</title>
+<style>
+:root{--g:#1b4d45;--c:#c48a5e;--ln:#dbe4e0}
+*{box-sizing:border-box;margin:0}
+body{font-family:Tajawal,system-ui,sans-serif;background:#f4f7f5;color:#15302b;padding:16px;line-height:1.6}
+.box{max-width:640px;margin:0 auto;background:#fff;border:1px solid var(--ln);border-radius:12px;padding:18px}
+h2{color:var(--g);margin-bottom:10px}
+input,select,textarea,button{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;margin:4px 0 10px;background:#fff}
+button{background:var(--g);color:#fff;border:0;cursor:pointer;font-weight:700}
+button.s{background:#fff;color:var(--g);border:1px solid var(--g);width:auto;padding:4px 12px;margin:0 4px 0 0}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}.tabs button{width:auto;flex:1;background:#fff;color:var(--g);border:1px solid var(--g);margin:0}.tabs .on{background:var(--g);color:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--ln)}
+#msg{position:fixed;bottom:16px;inset-inline:16px;max-width:400px;margin:auto;background:#15302b;color:#fff;padding:10px 16px;border-radius:8px;display:none;text-align:center}
+img.p{max-width:140px;border-radius:8px;display:none}
+label{font-weight:500;font-size:14px}
+</style>
+</head>
+<body>
+<div class="box" id="login"><h2>دخول الإدارة</h2><input type="password" id="pw" placeholder="كلمة المرور" autocomplete="current-password"><button id="go">دخول</button></div>
+<div class="box" id="app" style="display:none">
+ <div class="tabs" id="tabs"></div>
+ <div id="t0"><h2>إضافة منتج</h2>
+  <label>اسم المنتج</label><input id="n"><label>التصنيف</label><select id="c"></select><label>التصنيف الفرعي</label><select id="s"></select>
+  <label>الوصف</label><textarea id="d" rows="3"></textarea><label>السعر (ل.س.ج)</label><input id="p" type="number" min="0" inputmode="numeric">
+  <label>الصورة</label><input id="f" type="file" accept="image/*"><img class="p" id="pv" alt=""><button id="add">نشر المنتج</button></div>
+ <div id="t1" style="display:none"><h2>المنتجات</h2><div id="list"></div></div>
+ <div id="t2" style="display:none"><h2>التصنيفات</h2><p style="font-size:14px">سطر لكل تصنيف. الفرعية بعد النقطتين وبينها |<br>مثال: زيوت: بشرة | شعر</p><textarea id="ct" rows="10"></textarea><button id="sc">حفظ التصنيفات</button></div>
+ <div id="t3" style="display:none"><h2>الإعدادات</h2>
+  <label>رقم واتساب (بصيغة دولية بدون +)</label><input id="wa"><label>العنوان الرئيسي</label><input id="hl"><label>الجملة تحته</label><input id="sb">
+  <label>صورة كود شام كاش</label><input id="qf" type="file" accept="image/*"><button id="ss">حفظ الإعدادات</button>
+  <h2 style="margin-top:18px">أقسام نصية</h2><p style="font-size:14px">كل قسم: سطر العنوان ثم النص. افصل بين الأقسام بسطر فيه ---</p><textarea id="sx" rows="8"></textarea><button id="sv">حفظ الأقسام</button></div>
+</div>
+<div id="msg" role="status"></div>
+<script>
+const API="PASTE_WEB_APP_URL_HERE", $=i=>document.getElementById(i); let tok=sessionStorage.getItem("tk"), D={};
+const say=t=>{const m=$("msg");m.textContent=t;m.style.display="block";setTimeout(()=>m.style.display="none",3000)};
+async function post(o){
+  try{const r=await (await fetch(API,{method:"POST",body:JSON.stringify({token:tok,...o})})).json();
+    if(r.error==="auth"){sessionStorage.removeItem("tk");location.reload()}
+    if(!r.ok) say(({wrong:"كلمة المرور خاطئة",locked:"محاولات كثيرة، انتظر 15 دقيقة",bad:"طلب غير صالح"})[r.error]||r.error); return r}
+  catch(e){say("تعذّر الاتصال، حاول مرة أخرى");return{ok:false}}
+}
+function img(file){return new Promise(res=>{if(!file)return res(null);const i=new Image();i.onload=()=>{const k=Math.min(1,900/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=i.width*k;c.height=i.height*k;c.getContext("2d").drawImage(i,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.82).split(",")[1])};i.src=URL.createObjectURL(file)})}
+$("go").onclick=async()=>{const r=await post({action:"login",password:$("pw").value});if(r.ok){tok=r.token;sessionStorage.setItem("tk",tok);start()}};
+$("pw").onkeydown=e=>{if(e.key==="Enter")$("go").click()};
+["منتج جديد","المنتجات","التصنيفات","الإعدادات"].forEach((t,i)=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>tab(i);$("tabs").append(b)});
+function tab(n){[0,1,2,3].forEach(i=>{$("t"+i).style.display=i===n?"block":"none";$("tabs").children[i].classList.toggle("on",i===n)})}
+async function start(){
+  $("login").style.display="none";$("app").style.display="block";tab(0);
+  D=await (await fetch(API)).json();
+  $("c").replaceChildren(...D.categories.map(x=>new Option(x.cat,x.cat))); subs();
+  $("ct").value=D.categories.map(x=>x.cat+": "+x.subs).join("\n");
+  const c=D.config||{};$("wa").value=c.whatsapp||"";$("hl").value=c.headline||"";$("sb").value=c.sub||"";
+  $("sx").value=D.sections.map(x=>x.title+"\n"+x.body).join("\n---\n"); render();
+}
+function subs(){const x=D.categories.find(v=>v.cat===$("c").value);$("s").replaceChildren(new Option("بدون",""),...String(x?x.subs:"").split("|").map(v=>v.trim()).filter(Boolean).map(v=>new Option(v,v)))}
+$("c").onchange=subs;
+$("f").onchange=()=>{const f=$("f").files[0],p=$("pv");if(f){p.src=URL.createObjectURL(f);p.style.display="block"}};
+$("add").onclick=async()=>{
+  if(!$("n").value.trim()||$("p").value==="")return say("أدخل الاسم والسعر");
+  $("add").disabled=true;say("جارٍ النشر…");
+  const b=await img($("f").files[0]);
+  const r=await post({action:"add",name:$("n").value,cat:$("c").value,sub:$("s").value,desc:$("d").value,price:$("p").value,image:b,mime:"image/jpeg"});
+  $("add").disabled=false;
+  if(r.ok){say("تم نشر المنتج");["n","d","p","f"].forEach(i=>$(i).value="");$("pv").style.display="none";start()}
+};
+function render(){
+  const l=$("list");l.replaceChildren();
+  D.products.forEach(p=>{const r=document.createElement("div");r.className="row";
+    const t=document.createElement("span");t.textContent=p.name+" — "+Number(p.price).toLocaleString("en-US");
+    const a=document.createElement("span");
+    [[Number(p.stock)?"متوفر":"نفد",()=>post({action:"stock",id:p.id,stock:!Number(p.stock)})],["السعر",()=>{const v=prompt("السعر الجديد",p.price);return v===null?null:post({action:"price",id:p.id,price:v})}],["حذف",()=>confirm("حذف "+p.name+"؟")?post({action:"delete",id:p.id}):null]].forEach(([n,f])=>{
+      const b=document.createElement("button");b.className="s";b.textContent=n;b.onclick=async()=>{const x=await f();if(x&&x.ok)start()};a.append(b)});
+    r.append(t,a);l.append(r)});
+  if(!D.products.length)l.textContent="لا توجد منتجات بعد.";
+}
+$("sc").onclick=async()=>{const list=$("ct").value.split("\n").filter(x=>x.trim()).map(x=>{const i=x.indexOf(":");return{cat:i<0?x:x.slice(0,i),subs:i<0?"":x.slice(i+1)}});
+  if((await post({action:"categories",list})).ok){say("تم الحفظ");start()}};
+$("ss").onclick=async()=>{const q=await img($("qf").files[0]);
+  const r=await post({action:"config",whatsapp:$("wa").value.replace(/\D/g,""),headline:$("hl").value,sub:$("sb").value,shamcash:q,mime:"image/jpeg"});if(r.ok)say("تم الحفظ")};
+$("sv").onclick=async()=>{const list=$("sx").value.split(/\n---\n/).map(b=>{const a=b.trim().split("\n");return{title:a.shift(),body:a.join("\n").trim()}}).filter(x=>x.title);
+  if((await post({action:"sections",list})).ok)say("تم الحفظ")};
+if(tok)start();
+</script>
+</body>
+</html>
