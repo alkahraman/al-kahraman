@@ -149,6 +149,7 @@ async function load(){
   if(c.headline) $("hl").textContent=c.headline; if(c.sub) $("sb").textContent=c.sub;
   applyTexts(); banner();
   D.sections.forEach(s=>{const d=el("section","sec"),w=el("div","wrap"); w.append(el("h2",null,s.title),el("p",null,s.body)); d.append(w); (s.pos==="top"?$("secsTop"):$("secs")).append(d)});
+  history.replaceState({k:"|",cat:"",sub:""},"");
   show(); cartUI();
 }
 const waNum = () => String(D.config.whatsapp||"963960052632").replace(/\D/g,"");
@@ -201,6 +202,7 @@ function chips(){
   if(sub)c.append(el("span",null,"›"),el("b",null,sub));
 }
 function show(){
+  const k=cat+"|"+sub; if((history.state||{}).k!==k) history.pushState({k,cat,sub},"");
   chips();
   const q=$("q").value.trim(),g=$("gr");g.replaceChildren();$("sg").textContent="";
   const cc=D.categories.find(x=>x.cat===cat),subs=cc?String(cc.subs||"").split("|").map(x=>x.trim()).filter(Boolean):[];
@@ -274,6 +276,7 @@ $("fm").onsubmit=e=>{
   const msg=[t("order_head"),"",...L,"","المجموع: "+fmt(tot),"الاسم: "+$("nm").value,"العنوان: "+$("ad").value,"الدفع: "+$("pay").selectedOptions[0].textContent,$("nt").value?"ملاحظات: "+$("nt").value:""].join("\n");
   window.open("https://wa.me/"+waNum()+"?text="+encodeURIComponent(msg),"_blank");
 };
+  window.addEventListener("popstate",e=>{const s=e.state||{cat:"",sub:""};cat=s.cat;sub=s.sub;$("q").value="";show();scrollTo(0,0)});
 load();
 </script>
 </body>
