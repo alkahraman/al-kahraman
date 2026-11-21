@@ -74,7 +74,7 @@ label{font-weight:500;font-size:14px}
 </div>
 <div id="msg" role="status"></div>
 <script>
-const API="PASTE_WEB_APP_URL_HERE", $=i=>document.getElementById(i); let tok=sessionStorage.getItem("tk"), D={}, cur=0, inited=false, editId=null, C=[], S=[];
+const API="https://script.google.com/macros/s/AKfycbzUYLmuEFi7lMxpJaLbSZvrax3vJcI2GF_2pxte33WJSqwucG1CTjR3cZ0VXVDTCJs/exec", $=i=>document.getElementById(i); let tok=sessionStorage.getItem("tk"), D={}, cur=0, inited=false, editId=null, C=[], S=[];
 const say=t=>{const m=$("msg");m.textContent=t;m.style.display="block";clearTimeout(say.t);say.t=setTimeout(()=>m.style.display="none",3000)};
 const h=(t,a={},...k)=>{const e=document.createElement(t);Object.entries(a).forEach(([n,v])=>{if(n.startsWith("on"))e[n]=v;else if(n in e)e[n]=v;else e.setAttribute(n,v)});e.append(...k);return e};
 
