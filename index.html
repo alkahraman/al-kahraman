@@ -11,6 +11,10 @@
 body{font-family:Tajawal,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--c);outline-offset:2px}
+.bn{display:block;background:var(--c);color:var(--g2);text-align:center;font-weight:700;padding:9px 16px;text-decoration:none}
+.bn[hidden]{display:none}
+.bn[href]{cursor:pointer}
+.bn[href]:hover{background:var(--c2);color:#fff}
 .hero{background:var(--g);color:#fff;padding:28px 20px 56px;text-align:center}
 .top{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto 44px}
 .brand{font-family:Amiri,serif;font-size:30px;color:var(--c)}
@@ -19,17 +23,16 @@ button,input,select,textarea{font:inherit;color:inherit}
 h1{font-family:Amiri,serif;font-size:clamp(34px,6vw,60px);line-height:1.35;max-width:760px;margin:0 auto 12px}
 .hero p{color:#cfe0da;max-width:560px;margin:0 auto 26px}
 .sbox{max-width:560px;margin:0 auto;position:relative}
-.sbox input{width:100%;padding:15px 22px;border-radius:99px;border:2px solid transparent;font-size:17px;background:#fff}
+.sbox input{width:100%;padding:15px 22px;border-radius:99px;border:2px solid transparent;font-size:17px;background:#fff;color:var(--ink)}
 .wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.chip{border:1.5px solid var(--ln);background:#fff;border-radius:99px;padding:5px 16px;cursor:pointer}
-.chip.on{background:var(--g);color:#fff;border-color:var(--g)}
-.chips.sub .chip{font-size:14px;padding:3px 13px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px;margin-top:20px}
-.card{background:#fff;border:1px solid var(--ln);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.card{background:#fff;border:1px solid var(--ln);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer}
+.card:hover{border-color:var(--c)}
 .card img,.ph{width:100%;aspect-ratio:1;object-fit:cover;background:#e4ece8;display:block}
 .cb{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
 .cb small{color:var(--mut)}
+.cb small.d{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pr{color:var(--c2);font-weight:700;font-size:18px}
 .add{margin-top:auto;background:var(--g);color:#fff;border:0;border-radius:8px;padding:9px;cursor:pointer;font-weight:500}
 .add:disabled{background:#aeb9b5;cursor:default}
@@ -56,42 +59,81 @@ footer{background:var(--g2);color:#cfe0da;text-align:center;padding:28px 20px}
 #fm input,#fm select,#fm textarea{padding:9px 12px;border:1px solid var(--ln);border-radius:8px;width:100%}
 #qr{max-width:200px;display:none;margin:auto;border-radius:8px}
 .x{background:none;border:0;font-size:22px;cursor:pointer}
-@media(prefers-reduced-motion:reduce){#dr{transition:none}}
+/* نافذة المنتج */
+.md{position:fixed;inset:0;background:#0008;z-index:20;display:flex;align-items:center;justify-content:center;padding:14px}
+.md[hidden]{display:none}
+.mb{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:94vh;overflow:auto;position:relative}
+.iw{overflow:hidden;background:#e4ece8}
+.iw img{width:100%;max-height:62vh;object-fit:contain;display:block;cursor:zoom-in;transition:transform .2s}
+.iw img.z{transform:scale(2.2);cursor:zoom-out}
+.mx{position:absolute;top:8px;inset-inline-start:8px;background:#fffe;border-radius:50%;width:36px;height:36px;z-index:2;font-size:22px;line-height:1}
+.mi{padding:16px 18px 18px;display:grid;gap:6px}
+.mi b{font-size:22px}.mi small{color:var(--mut)}
+.mi p{white-space:pre-line}
+@media(prefers-reduced-motion:reduce){#dr,.iw img{transition:none}}
 </style>
 </head>
 <body>
+<a class="bn" id="bn" hidden></a>
 <section class="hero">
-  <div class="top"><div class="brand">الكهرمان</div><button class="cartbtn" id="cb">السلة<b id="cn">0</b></button></div>
+  <div class="top"><div class="brand" id="br">الكهرمان</div><button class="cartbtn" id="cb">السلة<b id="cn">0</b></button></div>
   <h1 id="hl">من الطبيعة إلى بشرتك وشعرك، بكل رقّة</h1>
   <p id="sb">منتجات عناية طبيعية مختارة بعناية، صافية في مكوّناتها ولطيفة في أثرها.</p>
-  <div class="sbox"><input id="q" type="search" placeholder="ابحث عن منتج… مثال: زيت لوز" aria-label="بحث"></div>
+  <div class="sbox"><input id="q" type="search" placeholder="ابحث عن منتج… مثال: زيت لوز" aria-label="بحث" autocomplete="off"></div>
 </section>
+<div id="secsTop"></div>
 <main class="wrap">
   <div class="chips" id="cats"></div><div class="chips sub" id="subs"></div>
   <div class="note" id="sg"></div>
   <div class="grid" id="gr"></div>
 </main>
 <div id="secs"></div>
-<footer><h2 style="font-family:Amiri,serif;color:#fff;font-size:28px">تواصل معنا</h2><p>اسألنا عن أي منتج، ونرد عليك بأسرع وقت.</p><a class="wa" id="wl" target="_blank" rel="noopener">راسلنا على واتساب</a><p style="margin-top:16px;font-size:14px">© الكهرمان</p></footer>
+<footer><h2 id="ctt" style="font-family:Amiri,serif;color:#fff;font-size:28px">تواصل معنا</h2><p id="cts">اسألنا عن أي منتج، ونرد عليك بأسرع وقت.</p><a class="wa" id="wl" target="_blank" rel="noopener">راسلنا على واتساب</a><p id="ft" style="margin-top:16px;font-size:14px">© الكهرمان</p></footer>
 
 <aside id="dr" aria-label="السلة">
-  <header><span>سلة المشتريات</span><button class="x" id="cx" aria-label="إغلاق">×</button></header>
+  <header><span id="dt">سلة المشتريات</span><button class="x" id="cx" aria-label="إغلاق">×</button></header>
   <div id="items"></div>
   <form id="fm">
     <b id="tot"></b>
     <input id="nm" placeholder="الاسم" required><input id="ad" placeholder="العنوان" required>
     <textarea id="nt" rows="2" placeholder="ملاحظات (اختياري)"></textarea>
-    <select id="pay"><option value="الدفع عند الاستلام">الدفع عند الاستلام</option></select>
-    <img id="qr" alt="كود شام كاش">
-    <button class="add" style="padding:12px">إرسال الطلب عبر واتساب</button>
+    <select id="pay"></select>
+    <img id="qr" alt="QR">
+    <button class="add" id="sbm" style="padding:12px">إرسال الطلب عبر واتساب</button>
   </form>
 </aside>
 
+<div class="md" id="md" hidden>
+  <div class="mb" role="dialog" aria-modal="true" aria-labelledby="mt">
+    <button class="x mx" id="mx" aria-label="إغلاق">×</button>
+    <div class="iw" id="iw"><img id="mim" alt=""></div>
+    <div class="mi">
+      <b id="mt"></b><small id="mc"></small><p id="mds"></p>
+      <div class="pr" id="mp"></div>
+      <button class="add" id="ma" style="padding:12px"></button>
+    </div>
+  </div>
+</div>
+
 <script>
-const API = "https://script.google.com/macros/s/AKfycby_VuQTDiZDGJgdw_GdIAPn7ZidsO2jVWII0mXdbC-jLniFLJzlGwO21Ky1IBlEh8Oa/exec";
-let D = {products:[],categories:[],sections:[],config:{}}, cat="", sub="", cart=JSON.parse(localStorage.getItem("cart")||"{}");
-const $ = i => document.getElementById(i), fmt = n => Number(n).toLocaleString("en-US")+" ل.س.ج";
+const API = "PASTE_WEB_APP_URL_HERE";
+let D = {products:[],categories:[],sections:[],config:{}}, cat="", sub="", cart=JSON.parse(localStorage.getItem("cart")||"{}"), cur=null;
+const $ = i => document.getElementById(i);
 const el = (t,c,x) => {const e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e};
+
+/* كل النصوص الثابتة وقيمها الافتراضية — تُعدَّل من الإدارة (مفتاح الشيت: t_ + الاسم) */
+const T0 = {
+ title:"الكهرمان | منتجات طبيعية", brand:"الكهرمان", cart_btn:"السلة", search_ph:"ابحث عن منتج… مثال: زيت لوز", all:"الكل",
+ contact_title:"تواصل معنا", contact_sub:"اسألنا عن أي منتج، ونرد عليك بأسرع وقت.", wa_btn:"راسلنا على واتساب", footer:"© الكهرمان",
+ cart_title:"سلة المشتريات", cart_empty:"السلة فارغة. أضف منتجًا لتبدأ.", total:"المجموع:",
+ ph_name:"الاسم", ph_addr:"العنوان", ph_notes:"ملاحظات (اختياري)", pay_cod:"الدفع عند الاستلام", pay_sham:"شام كاش",
+ submit:"إرسال الطلب عبر واتساب", add:"أضف إلى السلة", out:"نفد المخزون",
+ near:"لا توجد نتيجة مطابقة تمامًا. هذه أقرب النتائج:", nf:"لم نجد منتجًا بهذا الاسم. جرّب كلمة أخرى.",
+ empty:"لا توجد منتجات في هذا التصنيف بعد.", nocat:"لا توجد تصنيفات بعد.", err:"تعذّر تحميل المنتجات، حدّث الصفحة.",
+ order_head:"طلب جديد من موقع الكهرمان", cur:"ل.س.ج", close:"إغلاق"
+};
+const t = k => String((D.config&&D.config["t_"+k])||"").trim() || T0[k];
+const fmt = n => Number(n).toLocaleString("en-US")+" "+t("cur");
 
 const DEMO = {products:[
  {id:"1",name:"زيت اللوز الحلو",cat:"زيوت",sub:"بشرة",desc:"زيت لوز مضغوط على البارد",price:45000,image:"",stock:1},
@@ -100,23 +142,43 @@ const DEMO = {products:[
 
 async function load(){
   if(API.startsWith("PASTE")) D = DEMO;
-  else try{ D = await (await fetch(API)).json(); }catch(e){ $("gr").textContent="تعذّر تحميل المنتجات، حدّث الصفحة."; return; }
-  const c = D.config||{};
+  else try{ D = await (await fetch(API)).json(); }catch(e){ $("gr").textContent=T0.err; return; }
+  D.config = D.config||{};
+  D.categories.forEach(x=>{try{x.cv=JSON.parse(x.covers||"{}")||{}}catch(e){x.cv={}}});
+  const c = D.config;
   if(c.headline) $("hl").textContent=c.headline; if(c.sub) $("sb").textContent=c.sub;
-  const wa=String(c.whatsapp||"963960052632").replace(/\D/g,"");
-  $("wl").href="https://wa.me/"+wa;
-  if(c.shamcash){const o=el("option",null,"شام كاش"); o.value="شام كاش"; $("pay").append(o);}
-  D.sections.forEach(s=>{const d=el("section","sec"),w=el("div","wrap"); w.append(el("h2",null,s.title),el("p",null,s.body)); d.append(w); $("secs").append(d)});
-  chips(); show(); cartUI();
+  applyTexts(); banner();
+  D.sections.forEach(s=>{const d=el("section","sec"),w=el("div","wrap"); w.append(el("h2",null,s.title),el("p",null,s.body)); d.append(w); (s.pos==="top"?$("secsTop"):$("secs")).append(d)});
+  show(); cartUI();
+}
+const waNum = () => String(D.config.whatsapp||"963960052632").replace(/\D/g,"");
+function applyTexts(){
+  document.title=t("title"); $("br").textContent=t("brand");
+  $("cb").firstChild.textContent=t("cart_btn");
+  $("q").placeholder=t("search_ph");
+  $("ctt").textContent=t("contact_title"); $("cts").textContent=t("contact_sub");
+  $("wl").textContent=t("wa_btn"); $("wl").href="https://wa.me/"+waNum(); $("ft").textContent=t("footer");
+  $("dt").textContent=t("cart_title"); $("nm").placeholder=t("ph_name"); $("ad").placeholder=t("ph_addr"); $("nt").placeholder=t("ph_notes");
+  $("sbm").textContent=t("submit"); $("cx").setAttribute("aria-label",t("close")); $("mx").setAttribute("aria-label",t("close"));
+  const o=(v,x)=>{const e=el("option",null,x); e.value=v; return e};
+  $("pay").replaceChildren(o("cod",t("pay_cod"))); if(D.config.shamcash) $("pay").append(o("sham",t("pay_sham")));
+}
+function banner(){
+  const c=D.config, b=$("bn"), txt=String(c.banner_text||"").trim(), l=String(c.banner_link||"").trim();
+  if(String(c.banner_on)!=="1"||!txt){b.hidden=true;return}
+  b.textContent=txt; b.hidden=false; b.removeAttribute("href"); b.removeAttribute("target"); b.onclick=null;
+  if(/^https?:\/\//i.test(l)){b.href=l;b.target="_blank";b.rel="noopener"}
+  else if(l==="واتساب"){b.href="https://wa.me/"+waNum();b.target="_blank";b.rel="noopener"}
+  else if(l.startsWith("قسم:")){const n=l.slice(4).trim(); b.href="#"; b.onclick=e=>{e.preventDefault(); if(D.categories.some(x=>x.cat===n)){cat=n;sub="";$("q").value="";show();$("gr").scrollIntoView()}}}
 }
 
 /* بحث ذكي: تطبيع الحروف العربية + مسافة التعديل */
 const norm = s => String(s).toLowerCase().replace(/[\u064B-\u0652\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/[ؤئ]/g,"ء");
 function lev(a,b){const m=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=m[0];m[0]=i;for(let j=1;j<=b.length;j++){const t=m[j];m[j]=Math.min(m[j]+1,m[j-1]+1,p+(a[i-1]==b[j-1]?0:1));p=t}}return m[b.length]}
 function hit(tokens,w,fuzzy){return tokens.some(t=>t.includes(w)||(fuzzy&&w.length>=3&&lev(t.slice(0,w.length+1),w)<=(w.length>=7?2:1)))}
+const tk=p=>p._t||(p._t=norm([p.name,p.cat,p.sub,p.desc].join(" ")).split(/\s+/));
 function search(list,q){
   const ws=norm(q).split(/\s+/).filter(Boolean); if(!ws.length) return {r:list,near:false};
-  const tk=p=>norm([p.name,p.cat,p.sub,p.desc].join(" ")).split(/\s+/);
   let r=list.filter(p=>ws.every(w=>hit(tk(p),w,false)));
   if(r.length) return {r,near:false};
   r=list.filter(p=>ws.every(w=>hit(tk(p),w,true)));
@@ -126,14 +188,14 @@ function search(list,q){
 
 const cnt=n=>n===1?"منتج واحد":n===2?"منتجان":n+(n<11?" منتجات":" منتجًا");
 function cover(f){const p=D.products.find(x=>x.image&&f(x));return p?p.image:""}
-function folder(t,n,img,go){
+function folder(title,n,img,go){
   const b=el("button","fold");
-  if(img){const i=el("img");i.src=img;i.alt=t;i.loading="lazy";b.append(i)}else b.append(el("div","ph"));
-  const d=el("div","t");d.append(el("b",null,t),el("small",null,cnt(n)));b.append(d);b.onclick=()=>{go();scrollTo(0,0)};return b}
+  if(img){const i=el("img");i.src=img;i.alt=title;i.loading="lazy";b.append(i)}else b.append(el("div","ph"));
+  const d=el("div","t");d.append(el("b",null,title),el("small",null,cnt(n)));b.append(d);b.onclick=()=>{go();scrollTo(0,0)};return b}
 function chips(){
   const c=$("cats");c.replaceChildren();c.className="crumb";$("subs").replaceChildren();
   if(!cat)return;
-  const a=el("button",null,"الكل");a.onclick=()=>{cat="";sub="";show()};
+  const a=el("button",null,t("all"));a.onclick=()=>{cat="";sub="";show()};
   const b=el("button",null,cat);b.onclick=()=>{sub="";show()};
   c.append(a,el("span",null,"›"),b);
   if(sub)c.append(el("span",null,"›"),el("b",null,sub));
@@ -141,51 +203,76 @@ function chips(){
 function show(){
   chips();
   const q=$("q").value.trim(),g=$("gr");g.replaceChildren();$("sg").textContent="";
-  const cur=D.categories.find(x=>x.cat===cat),subs=cur?String(cur.subs||"").split("|").map(x=>x.trim()).filter(Boolean):[];
-  let items=D.products.filter(p=>(!cat||p.cat===cat)&&(!sub||p.sub===sub)),folders=false;
+  const cc=D.categories.find(x=>x.cat===cat),subs=cc?String(cc.subs||"").split("|").map(x=>x.trim()).filter(Boolean):[];
+  let items=q?D.products:D.products.filter(p=>(!cat||p.cat===cat)&&(!sub||p.sub===sub)),folders=false;
   if(!q&&!cat){
     g.className="fgrid";
-    D.categories.forEach(x=>g.append(folder(x.cat,D.products.filter(p=>p.cat===x.cat).length,cover(p=>p.cat===x.cat),()=>{cat=x.cat;sub="";show()})));
-    if(!D.categories.length)g.append(el("p","note","لا توجد تصنيفات بعد."));
+    D.categories.forEach(x=>g.append(folder(x.cat,D.products.filter(p=>p.cat===x.cat).length,(x.cv&&x.cv["*"])||cover(p=>p.cat===x.cat),()=>{cat=x.cat;sub="";show()})));
+    if(!D.categories.length)g.append(el("p","note",t("nocat")));
     return}
   if(!q&&cat&&!sub&&subs.length){
     folders=true;
-    subs.forEach(s=>g.append(folder(s,D.products.filter(p=>p.cat===cat&&p.sub===s).length,cover(p=>p.cat===cat&&p.sub===s),()=>{sub=s;show()})));
+    subs.forEach(s=>g.append(folder(s,D.products.filter(p=>p.cat===cat&&p.sub===s).length,(cc.cv&&cc.cv[s])||cover(p=>p.cat===cat&&p.sub===s),()=>{sub=s;show()})));
     items=items.filter(p=>!subs.includes(p.sub))}
   g.className=folders?"fgrid":"grid";
   const {r,near}=q?search(items,q):{r:items,near:false};
-  $("sg").textContent=q&&near&&r.length?"لا توجد نتيجة مطابقة تمامًا. هذه أقرب النتائج:":"";
-  if(!r.length&&!folders){g.append(el("p","note",q?"لم نجد منتجًا بهذا الاسم. جرّب كلمة أخرى.":"لا توجد منتجات في هذا التصنيف بعد."));return}
+  $("sg").textContent=q&&near&&r.length?t("near"):"";
+  if(!r.length&&!folders){g.append(el("p","note",q?t("nf"):t("empty")));return}
   r.forEach(p=>{
-    const c=el("div","card");
+    const c=el("div","card"); c.tabIndex=0; c.setAttribute("role","button");
     if(p.image){const i=el("img");i.src=p.image;i.alt=p.name;i.loading="lazy";c.append(i)}else c.append(el("div","ph"));
     const b=el("div","cb");b.append(el("b",null,p.name),el("small",null,[p.cat,p.sub].filter(Boolean).join(" · ")));
-    if(p.desc)b.append(el("small",null,p.desc));
+    if(p.desc)b.append(el("small","d",p.desc));
     b.append(el("div","pr",fmt(p.price)));
-    const a=el("button","add",Number(p.stock)?"أضف إلى السلة":"نفد المخزون");a.disabled=!Number(p.stock);
-    a.onclick=()=>{cart[p.id]=(cart[p.id]||0)+1;saveCart();$("dr").classList.add("open")};b.append(a);c.append(b);g.append(c)});
+    const a=el("button","add",Number(p.stock)?t("add"):t("out"));a.disabled=!Number(p.stock);
+    a.onclick=e=>{e.stopPropagation();addCart(p)};b.append(a);c.append(b);
+    c.onclick=()=>openP(p); c.onkeydown=e=>{if(e.key==="Enter")openP(p)};
+    g.append(c)});
 }
-$("q").addEventListener("input",show);
 
+/* البحث: لا نعيد الرسم أثناء تركيب الحروف العربية، وتأخير بسيط لتخفيف الحمل */
+let st, comp=false;
+function runSearch(){ if($("q").value.trim()){cat="";sub=""} show() }
+$("q").addEventListener("compositionstart",()=>{comp=true});
+$("q").addEventListener("compositionend",()=>{comp=false;clearTimeout(st);st=setTimeout(runSearch,120)});
+$("q").addEventListener("input",()=>{clearTimeout(st); if(comp)return; st=setTimeout(runSearch,140)});
+
+/* نافذة المنتج */
+function openP(p){
+  cur=p; const im=$("mim");
+  im.classList.remove("z"); im.style.transformOrigin="";
+  if(p.image){im.src=p.image;im.alt=p.name;$("iw").style.display="block"}else{im.removeAttribute("src");$("iw").style.display="none"}
+  $("mt").textContent=p.name; $("mc").textContent=[p.cat,p.sub].filter(Boolean).join(" · ");
+  $("mds").textContent=p.desc||""; $("mp").textContent=fmt(p.price);
+  const a=$("ma"); a.textContent=Number(p.stock)?t("add"):t("out"); a.disabled=!Number(p.stock);
+  $("md").hidden=false; document.body.style.overflow="hidden"; $("mx").focus();
+}
+function closeP(){$("md").hidden=true;document.body.style.overflow=""}
+$("mx").onclick=closeP;
+$("md").onclick=e=>{if(e.target.id==="md")closeP()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeP();$("dr").classList.remove("open")}});
+$("mim").onclick=e=>{const i=e.currentTarget,r=i.getBoundingClientRect();i.style.transformOrigin=((e.clientX-r.left)/r.width*100)+"% "+((e.clientY-r.top)/r.height*100)+"%";i.classList.toggle("z")};
+$("ma").onclick=()=>{if(cur){addCart(cur);closeP()}};
+
+function addCart(p){cart[p.id]=(cart[p.id]||0)+1;saveCart();$("dr").classList.add("open")}
 function saveCart(){localStorage.setItem("cart",JSON.stringify(cart));cartUI()}
 function cartUI(){
   const ids=Object.keys(cart).filter(i=>D.products.some(p=>p.id==i)); let tot=0,n=0; const box=$("items"); box.replaceChildren();
-  if(!ids.length) box.append(el("p","note","السلة فارغة. أضف منتجًا لتبدأ."));
+  if(!ids.length) box.append(el("p","note",t("cart_empty")));
   ids.forEach(i=>{const p=D.products.find(x=>x.id==i); tot+=p.price*cart[i]; n+=cart[i];
     const r=el("div","it"), q=el("span","q"), m=el("button",null,"−"), pl=el("button",null,"+");
     m.onclick=()=>{cart[i]--; if(cart[i]<1)delete cart[i]; saveCart()}; pl.onclick=()=>{cart[i]++;saveCart()};
     q.append(m,el("b",null," "+cart[i]+" "),pl);
     r.append(el("span",null,p.name),q,el("span",null,fmt(p.price*cart[i]))); box.append(r)});
-  $("cn").textContent=n; $("tot").textContent="المجموع: "+fmt(tot); $("fm").style.display=ids.length?"grid":"none";
+  $("cn").textContent=n; $("tot").textContent=t("total")+" "+fmt(tot); $("fm").style.display=ids.length?"grid":"none";
 }
 $("cb").onclick=()=>$("dr").classList.add("open"); $("cx").onclick=()=>$("dr").classList.remove("open");
-$("pay").onchange=()=>{const s=$("pay").value==="شام كاش"&&D.config.shamcash; $("qr").style.display=s?"block":"none"; if(s)$("qr").src=D.config.shamcash};
+$("pay").onchange=()=>{const s=$("pay").value==="sham"&&D.config.shamcash; $("qr").style.display=s?"block":"none"; if(s)$("qr").src=D.config.shamcash};
 $("fm").onsubmit=e=>{
   e.preventDefault(); let tot=0,L=[];
   Object.keys(cart).forEach(i=>{const p=D.products.find(x=>x.id==i); if(!p)return; tot+=p.price*cart[i]; L.push("• "+p.name+" × "+cart[i]+" = "+fmt(p.price*cart[i]))});
-  const msg=["طلب جديد من موقع الكهرمان","",...L,"","المجموع: "+fmt(tot),"الاسم: "+$("nm").value,"العنوان: "+$("ad").value,"الدفع: "+$("pay").value,$("nt").value?"ملاحظات: "+$("nt").value:""].join("\n");
-  const wa=String(D.config.whatsapp||"963960052632").replace(/\D/g,"");
-  window.open("https://wa.me/"+wa+"?text="+encodeURIComponent(msg),"_blank");
+  const msg=[t("order_head"),"",...L,"","المجموع: "+fmt(tot),"الاسم: "+$("nm").value,"العنوان: "+$("ad").value,"الدفع: "+$("pay").selectedOptions[0].textContent,$("nt").value?"ملاحظات: "+$("nt").value:""].join("\n");
+  window.open("https://wa.me/"+waNum()+"?text="+encodeURIComponent(msg),"_blank");
 };
 load();
 </script>
